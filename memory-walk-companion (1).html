@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
+<title>기억산책 말벗</title>
+<meta name="theme-color" content="#2E6B66" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="말벗" />
+<link rel="manifest" href="manifest.json" />
+<link rel="apple-touch-icon" href="icon-192.png" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+<style>
+  :root{
+    --bg:#FBF8F2; --card:#FFFFFF; --ink:#2A2622; --sub:#6B635B; --line:#E7DFD3;
+    --teal:#2E6B66; --tealSoft:#E4EFEC; --warm:#D98E5A; --warmSoft:#FBEFE4;
+    --alert:#C0392B; --alertSoft:#FBE9E7; --fs:1; }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:Pretendard,'Apple SD Gothic Neo','Malgun Gothic',system-ui,sans-serif;
+       background:var(--bg);color:var(--ink);}
+  header{background:var(--card);border-bottom:1px solid var(--line);padding:12px 20px;
+         display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+  .brand{font-size:22px;font-weight:800;color:var(--teal);}
+  .badge{font-size:13px;font-weight:700;color:var(--warm);background:var(--warmSoft);padding:3px 10px;border-radius:999px;}
+  .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+  .tab{padding:8px 14px;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--sub);font-weight:700;cursor:pointer;font-size:14px;}
+  .tab.on{background:var(--teal);color:#fff;border-color:var(--teal);}
+  .wrap{max-width:880px;margin:0 auto;padding:20px;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 1px 3px rgba(0,0,0,.03);}
+  label.lbl{display:block;font-size:14px;color:var(--sub);margin:10px 0 4px;font-weight:700;}
+  input.field{width:100%;padding:14px 16px;border-radius:12px;border:1px solid var(--line);font-size:18px;margin-bottom:10px;outline:none;font-family:inherit;}
+  .chip{padding:10px 16px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--sub);font-weight:700;cursor:pointer;font-size:15px;}
+  .chip.on{background:var(--tealSoft);color:var(--teal);border-color:var(--teal);}
+  .primary{width:100%;padding:16px;border-radius:14px;border:none;background:var(--teal);color:#fff;font-size:20px;font-weight:800;cursor:pointer;}
+  .primary.warm{background:var(--warm);}
+  #transcript{max-height:min(440px,52vh);overflow-y:auto;}
+  .bubble{max-width:82%;padding:14px 18px;border-radius:18px;line-height:1.5;margin-bottom:12px;}
+  .b-robot{background:var(--tealSoft);color:var(--ink);border-bottom-left-radius:4px;font-size:calc(24px*var(--fs));}
+  .b-elder{background:var(--warm);color:#fff;border-bottom-right-radius:4px;font-size:calc(21px*var(--fs));margin-left:auto;}
+  .row-r{display:flex;justify-content:flex-start;}
+  .row-e{display:flex;justify-content:flex-end;}
+  #menu{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;}
+  .menucard{text-align:left;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 20px;cursor:pointer;}
+  .menucard .t{font-size:22px;font-weight:800;color:var(--teal);}
+  .menucard .d{font-size:15px;color:var(--sub);margin-top:4px;}
+  #options{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;}
+  .opt{padding:16px 22px;border-radius:14px;border:2px solid var(--teal);background:#fff;color:var(--teal);font-size:calc(20px*var(--fs));font-weight:700;cursor:pointer;}
+  #inputbar{display:flex;gap:8px;margin-top:14px;align-items:center;}
+  #inputbar input{flex:1;padding:16px;border-radius:12px;border:1px solid var(--line);font-size:calc(20px*var(--fs));outline:none;font-family:inherit;}
+  .mic{padding:16px 18px;border-radius:14px;border:2px solid var(--teal);background:#fff;color:var(--teal);font-weight:700;cursor:pointer;font-size:18px;}
+  .mic.live{background:var(--warm);color:#fff;border-color:var(--warm);}
+  .send{padding:16px 22px;border-radius:14px;border:none;background:var(--teal);color:#fff;font-weight:800;cursor:pointer;font-size:18px;}
+  .riskbanner{background:var(--alertSoft);border:2px solid var(--alert);border-radius:14px;padding:14px;margin-bottom:14px;color:var(--alert);font-weight:700;font-size:16px;}
+  .link{margin-top:18px;background:none;border:none;color:var(--sub);font-size:14px;cursor:pointer;text-decoration:underline;}
+  .recrow{display:flex;gap:12px;padding:4px 0;border-bottom:1px solid var(--line);font-size:15px;line-height:1.7;}
+  .recrow .k{width:130px;color:var(--sub);flex-shrink:0;}
+  .recrow .v{font-weight:600;}
+  .item{display:flex;gap:8px;align-items:center;padding:3px 0;font-size:15px;}
+  .item .ck{width:20px;font-weight:800;}
+  .muted{color:var(--sub);font-size:13px;}
+  .hidden{display:none!important;}
+  @media (max-width:560px){ #menu{grid-template-columns:1fr;} }
+  @media print{
+    header,#elderView,.tab,.primary,.controls,.noprint{display:none!important;}
+    .wrap{max-width:100%;} body{background:#fff;}
+    #staffView{display:block!important;}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <span class="brand">기억산책 말벗</span>
+    <span class="badge">AI 말벗입니다</span>
+  </div>
+  <div class="controls">
+    <span class="muted">글씨</span>
+    <button class="tab" onclick="setFont(1)">보통</button>
+    <button class="tab" onclick="setFont(1.25)">크게</button>
+    <label class="muted" style="display:flex;align-items:center;gap:6px;"><input type="checkbox" id="voiceChk" checked /> 음성</label>
+    <button class="tab on" id="tabElder" onclick="setView('elder')">어르신 화면</button>
+    <button class="tab" id="tabStaff" onclick="setView('staff')">직원 화면</button>
+  </div>
+</header>
+
+<!-- ===== 어르신 화면 ===== -->
+<div id="elderView" class="wrap">
+  <!-- 설정 -->
+  <div id="setup" class="card">
+    <h2 style="font-size:24px;margin:0 0 6px;">대화를 시작할게요</h2>
+    <p class="muted" style="font-size:16px;margin-top:0;">직원이 어르신 정보를 입력한 뒤 화면을 어르신께 보여드리세요.</p>
+    <label class="lbl">어르신 성함</label>
+    <input id="nameInput" class="field" placeholder="예: 김순자" />
+    <label class="lbl">부르는 호칭</label>
+    <div id="honChips" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;"></div>
+    <button class="primary" onclick="begin()">대화 시작하기</button>
+  </div>
+
+  <!-- 대화 -->
+  <div id="chat" class="hidden">
+    <div id="riskBanner" class="riskbanner hidden">방금 중요한 신호가 있었어요. 선생님이 곧 살펴보러 오실 거예요.</div>
+    <div id="transcript" class="card"></div>
+    <div id="menu" class="hidden"></div>
+    <div id="options"></div>
+    <div id="inputbar" class="hidden">
+      <input id="elderInput" placeholder="여기에 말씀을 적어주세요" />
+      <button id="micBtn" class="mic" onclick="toggleMic()">말하기</button>
+      <button class="send" onclick="sendElder()">보내기</button>
+    </div>
+    <button class="link" onclick="resetAll()">처음으로</button>
+  </div>
+</div>
+
+<!-- ===== 직원 화면 ===== -->
+<div id="staffView" class="wrap hidden">
+  <div id="alertCard" class="card"></div>
+  <div class="card" style="margin-top:14px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;" class="noprint">
+      <h2 style="margin:0;font-size:20px;">정서지원·의사소통 급여 제공 기록 (자유 양식)</h2>
+      <button class="tab" onclick="window.print()">기록 인쇄 / PDF 저장</button>
+    </div>
+    <div id="recordBody" style="margin-top:10px;"></div>
+  </div>
+  <p class="muted noprint" style="margin-top:14px;">
+    ※ 이 기록은 요양보호사의 정서지원·의사소통 급여 제공을 보조·문서화하기 위한 초안입니다.
+    법정 서비스 항목(노인장기요양보험법 시행규칙 별지 제16호 서식 기준)을 반영하되 양식은 자유 형식이며,
+    최종 판단과 기록 책임은 담당 직원에게 있습니다. 모든 처리는 이 PC 안에서만 이루어집니다.
+  </p>
+</div>
+
+<script>
+/* ============ 데이터 ============ */
+var SERVICE_ITEMS = [
+  {id:"emotional", label:"말벗·격려·위로 / 정서적 지원"},
+  {id:"daily",     label:"일상회화 / 의사소통 도움"},
+  {id:"reading",   label:"책(글) 읽기"},
+  {id:"letter",    label:"편지 대필 / 의사전달 대행"},
+  {id:"needs",     label:"욕구 파악"},
+  {id:"connect",   label:"사회적 지지체계 연계 / 관계망 연결"},
+  {id:"safety",    label:"안부 확인 / 비상연락·응급 대처"}
+];
+var RISK_RULES = [
+  {cat:"자살·죽음 표현", w:["죽고 싶","죽고싶","그만 살","그만살","살기 싫","살기싫","죽어야","없어졌으면"]},
+  {cat:"학대 의심",     w:["때렸","때린다","맞았","무섭","돈을 가져","돈을 빼앗"]},
+  {cat:"통증·응급",     w:["가슴이 아프","숨이 차","숨차","넘어졌","쓰러","어지러"]},
+  {cat:"섭취 문제",     w:["밥을 못","못 먹겠","목에 걸","삼키기 힘"]},
+  {cat:"우울·고립",     w:["아무도 안","아무도 없","필요 없는 사람","쓸모없","혼자뿐"]},
+  {cat:"성적 불편감",   w:["누가 만졌","이상하게 만졌","기분 나쁘게 했"]}
+];
+var TOPICS = {
+  "고향":{q:"어르신 고향은 시골이었어요, 도시였어요?", opts:["시골이었어요","도시였어요","잘 모르겠어요"]},
+  "가족":{q:"오늘은 어떤 가족이 제일 생각나세요?", opts:["자녀","손주","남편·아내","형제"]},
+  "음식":{q:"젊으셨을 때 제일 좋아하시던 음식은 어떤 거였어요?", opts:["국밥·국수","떡·전","고기","생선"]},
+  "옛일":{q:"예전에 가장 바쁘게 지내시던 때가 언제였어요?", opts:["농사지을 때","장사할 때","직장 다닐 때","아이 키울 때"]}
+};
+var READINGS = [
+  {t:"따뜻한 날", body:"창밖에 햇살이 참 따뜻합니다. 마당에 나가면 부드러운 바람이 얼굴을 스치는, 그런 날이지요. 이런 날은 마음도 조금 가벼워집니다."},
+  {t:"옛말 한마디", body:"옛말에 가는 말이 고와야 오는 말이 곱다고 했지요. 천 리 길도 한 걸음부터라는 말도 있고요. 서두르지 않아도 괜찮습니다."},
+  {t:"저녁 골목", body:"어릴 적 골목길, 저녁이 되면 집집마다 밥 짓는 냄새가 났습니다. 어머니가 부르는 소리에 뛰어 들어가던 그 시절이 떠오르네요."}
+];
+
+/* ============ 감정 반영(오프라인 규칙) ============ */
+var REFLECT_BANK = [
+  {w:["보고 싶","그립","그리워","외로","쓸쓸","혼자"], r:["많이 그리우셨군요.","혼자 계신 시간이 길게 느껴지셨겠어요.","그 마음 충분히 이해돼요."]},
+  {w:["좋았","행복","즐거","기뻤","재미","웃","고마"], r:["그때 참 좋으셨겠어요.","말씀하시는 동안 표정이 환해지셨어요.","그 기억이 어르신께 큰 힘이 되었겠어요."]},
+  {w:["힘들","속상","슬프","아쉽","서운","고생","아프"], r:["많이 속상하셨겠어요.","그렇게 느끼실 만큼 마음이 힘드셨군요.","천천히 말씀하셔도 괜찮아요."]},
+  {w:["딸","아들","손주","손녀","며느리","사위","남편","아내","영감","마누라","자식","어머니","아버지"], r:["가족 이야기는 늘 마음을 따뜻하게 하지요.","소중한 분 이야기네요.","그분을 많이 아끼셨군요."]}
+];
+var FOLLOWUPS = {
+  "고향":["고향에서 제일 기억에 남는 곳은 어디였어요?","그곳 풍경이 지금도 떠오르세요?"],
+  "가족":["그분과 함께한 가장 좋은 기억은 무엇이세요?","요즘도 자주 생각나세요?"],
+  "음식":["그 음식을 누구와 함께 드셨어요?","직접 만들어 보신 적도 있으세요?"],
+  "옛일":["그때 어르신은 어떤 분이셨어요?","제일 보람 있었던 일은 무엇이었어요?"],
+  "_":["조금만 더 들려주실 수 있으세요?","그때 이야기를 더 듣고 싶어요.","어떤 마음이셨는지 들려주세요."]
+};
+var lastReflect = "";
+function reflect(text, topic){
+  var refl = "그 이야기를 들려주셔서 고맙습니다. 어르신께 소중한 기억 같아요.";
+  for(var i=0;i<REFLECT_BANK.length;i++){
+    var b=REFLECT_BANK[i];
+    for(var j=0;j<b.w.length;j++){ if(text.indexOf(b.w[j])>=0){ refl=pick(b.r); break; } }
+    if(refl!=="그 이야기를 들려주셔서 고맙습니다. 어르신께 소중한 기억 같아요.") break;
+  }
+  if(refl===lastReflect) refl="제가 잘 듣고 있어요.";
+  lastReflect=refl;
+  var fu = (FOLLOWUPS[topic]||FOLLOWUPS["_"]);
+  return refl+" "+pick(fu);
+}
+function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+function detectRisk(t){ for(var i=0;i<RISK_RULES.length;i++){var r=RISK_RULES[i];for(var j=0;j<r.w.length;j++){if(t.indexOf(r.w[j])>=0)return r.cat;}} return null; }
+
+/* ============ 상태 ============ */
+var S = { name:"", hon:"어르신", view:"elder", screen:"menu", topic:null,
+          provided:{}, risks:[], moods:[], topicsDiscussed:{}, letter:null, letterTo:"" };
+var optHandler = null;
+
+/* ============ 음성 ============ */
+function speak(text){
+  if(!document.getElementById('voiceChk').checked) return;
+  if(!('speechSynthesis' in window)) return;
+  try{
+    window.speechSynthesis.cancel();
+    var u=new SpeechSynthesisUtterance(text);
+    u.lang="ko-KR"; u.rate=0.92;
+    var ko=(window.speechSynthesis.getVoices()||[]).find(function(v){return v.lang&&v.lang.indexOf("ko")===0;});
+    if(ko) u.voice=ko;
+    window.speechSynthesis.speak(u);
+  }catch(e){}
+}
+var recog=null, micLive=false;
+function micAvailable(){ return ('webkitSpeechRecognition' in window)||('SpeechRecognition' in window); }
+function toggleMic(){
+  if(!micAvailable()){ alert("이 브라우저에서는 음성 입력이 지원되지 않습니다. 키보드로 입력해 주세요."); return; }
+  if(micLive){ if(recog) recog.stop(); return; }
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  recog=new SR(); recog.lang="ko-KR"; recog.interimResults=false; recog.maxAlternatives=1;
+  recog.onresult=function(e){ document.getElementById('elderInput').value=e.results[0][0].transcript; };
+  recog.onend=function(){ micLive=false; updateMic(); };
+  recog.onerror=function(){ micLive=false; updateMic(); };
+  micLive=true; updateMic();
+  try{ recog.start(); }catch(e){ micLive=false; updateMic(); }
+}
+function updateMic(){ var b=document.getElementById('micBtn'); if(!b)return; b.textContent=micLive?"듣는 중":"말하기"; b.className="mic"+(micLive?" live":""); }
+
+/* ============ 렌더 헬퍼 ============ */
+function addMsg(role,text){
+  var t=document.getElementById('transcript');
+  var row=document.createElement('div'); row.className=role==='robot'?'row-r':'row-e';
+  var b=document.createElement('div'); b.className='bubble '+(role==='robot'?'b-robot':'b-elder'); b.textContent=text;
+  row.appendChild(b); t.appendChild(row); t.scrollTop=t.scrollHeight;
+}
+function robot(text,options){ addMsg('robot',text); speak(text); setOptions(options||[]); }
+function elder(text){ addMsg('elder',text); }
+function setOptions(arr){
+  var o=document.getElementById('options'); o.innerHTML="";
+  arr.forEach(function(label){
+    var btn=document.createElement('button'); btn.className='opt'; btn.textContent=label;
+    btn.onclick=function(){ if(optHandler) optHandler(label); };
+    o.appendChild(btn);
+  });
+  showInput(needFreeInput());
+}
+function needFreeInput(){
+  var noOpts = document.getElementById('options').children.length===0;
+  if(S.screen==='letter' && S.letterTo) return true;
+  if(S.screen==='talk' && noOpts) return true;
+  if(S.screen==='reminisce' && S.topic && noOpts) return true;
+  return false;
+}
+function showInput(b){ document.getElementById('inputbar').className=b?'':'hidden'; }
+function showMenu(b){
+  var m=document.getElementById('menu');
+  m.className=b?'':'hidden';
+  if(b && !m.dataset.built){
+    [["오늘 안부 나누기","기분·컨디션 확인",openTalk],
+     ["옛이야기 나누기","고향·가족·음식 회상",openReminisce],
+     ["글 한 편 듣기","짧은 글 읽어드려요",openReading],
+     ["가족에게 말 전하기","편지 대필·의사전달",openLetter]].forEach(function(x){
+      var c=document.createElement('button'); c.className='menucard';
+      c.innerHTML='<div class="t">'+x[0]+'</div><div class="d">'+x[1]+'</div>'; c.onclick=x[2]; m.appendChild(c);
+    });
+    var fin=document.createElement('div'); fin.style.gridColumn="1 / -1";
+    var fb=document.createElement('button'); fb.className='primary warm'; fb.textContent="오늘 대화 마치고 기록 만들기"; fb.onclick=finish;
+    fin.appendChild(fb); m.appendChild(fin); m.dataset.built="1";
+  }
+}
+function mark(){ for(var i=0;i<arguments.length;i++) S.provided[arguments[i]]=true; }
+
+/* ============ 흐름 ============ */
+function gotoMenu(say){ S.screen='menu'; S.topic=null; showMenu(true); setOptions([]); showInput(false); if(say) robot(say,[]); else setOptions([]); showMenu(true); }
+
+function begin(){
+  var n=document.getElementById('nameInput').value.trim(); if(!n){ alert("어르신 성함을 입력해 주세요."); return; }
+  S.name=n;
+  document.getElementById('setup').classList.add('hidden');
+  document.getElementById('chat').classList.remove('hidden');
+  S.screen='menu'; showMenu(true);
+  robot(S.name+" "+S.hon+", 안녕하세요. 저는 말벗 기억이예요. 오늘 어떤 이야기를 나눠볼까요? 아래에서 골라주셔도 돼요.", []);
+}
+
+function handleRisk(cat,quote){
+  S.risks.push({ts:nowStr(),cat:cat,quote:quote}); mark('safety','connect');
+  document.getElementById('riskBanner').classList.remove('hidden');
+  robot("그 말씀은 아주 중요한 이야기예요. 제가 선생님께 바로 알려드릴게요. 지금 혼자 계시지 않게 도와드릴게요.", ["메뉴로 갈래요"]);
+  renderStaff();
+}
+
+function sendElder(textRaw){
+  var el=document.getElementById('elderInput');
+  var text=(textRaw!=null?textRaw:el.value).trim(); if(!text) return;
+  el.value=""; elder(text);
+  var cat=detectRisk(text); if(cat){ handleRisk(cat,text); return; }
+  if(S.screen==='letter'){
+    S.letter={to:S.letterTo,body:text}; mark('letter','needs','connect');
+    robot((S.letterTo||"가족")+"분께 \""+text+"\" 라고 전해드릴게요. 선생님께도 알려드릴게요. 또 전하고 싶은 말씀 있으세요?", ["없어요, 메뉴로","더 전할래요"]);
+    return;
+  }
+  mark('emotional','daily');
+  if(S.topic) S.topicsDiscussed[S.topic]=true;
+  robot(reflect(text,S.topic), ["더 이야기할래요","메뉴로 갈래요"]);
+}
+
+function openTalk(){ S.screen='talk'; showMenu(false); robot("오늘 기분은 어떠세요? 아래에서 골라주셔도 돼요.", ["좋음","보통","안 좋음"]); }
+function pickMood(m){ elder("오늘 기분은 "+m+"이에요."); S.moods.push(m); mark('emotional','daily','safety');
+  robot(m==="안 좋음"?"마음이 편치 않으셨군요. 천천히 말씀하셔도 괜찮아요. 어디 불편하신 데는 없으세요?":"그러시군요, 다행이에요. 어디 불편하신 데는 없으세요?", ["없어요","조금 있어요"]); }
+function pickDiscomfort(v){ elder(v);
+  if(v==="조금 있어요"){ robot("어디가 어떻게 불편하신지 편하게 말씀해 주세요. 제가 잘 듣고 선생님께 전해드릴게요.", []); }
+  else { mark('safety'); robot("네, 잘 지내고 계셔서 좋네요. 다른 이야기도 나눠볼까요?", ["메뉴로 갈래요"]); } }
+
+function openReminisce(){ S.screen='reminisce'; S.topic=null; showMenu(false);
+  robot("옛이야기를 나눠볼까요? 어떤 이야기가 좋으세요?", Object.keys(TOPICS).map(function(k){return k+" 이야기";})); }
+function pickTopic(label){ var key=label.replace(" 이야기",""); S.topic=key; S.topicsDiscussed[key]=true;
+  elder(key+" 이야기 할래요."); mark('emotional'); robot(TOPICS[key].q, TOPICS[key].opts); }
+
+function openReading(){ S.screen='reading'; showMenu(false);
+  robot("제가 짧은 글 한 편 읽어드릴게요. 어떤 걸 들어보실래요?", READINGS.map(function(r){return r.t;})); }
+function pickReading(t){ var r=null; READINGS.forEach(function(x){if(x.t===t)r=x;}); elder("'"+t+"' 들려주세요."); mark('reading','emotional');
+  robot(r.body, []);
+  setTimeout(function(){ robot("어떠셨어요? 마음에 드셨나요?", ["좋았어요","다른 거 들을래요","메뉴로 갈래요"]); },300); }
+
+function openLetter(){ S.screen='letter'; S.letterTo=""; showMenu(false);
+  robot("가족에게 전하고 싶은 말씀이 있으세요? 누구에게 전할까요?", ["자녀","손주","남편·아내","형제"]); }
+function pickLetterTo(who){ S.letterTo=who; elder(who+"에게 전할래요.");
+  robot(who+"분께 어떤 말씀을 전하고 싶으세요? 편하게 말씀해 주세요. 제가 받아 적어 선생님께 전해드릴게요.", []); }
+
+function backToMenu(){ S.screen='menu'; S.topic=null; document.getElementById('riskBanner'); showMenu(true); robot("네, 알겠어요. 또 무엇을 해볼까요?", []); }
+
+/* 옵션 라우팅 */
+optHandler=function(o){
+  if(o==="메뉴로 갈래요"||o==="없어요, 메뉴로"){ backToMenu(); return; }
+  if(o==="더 이야기할래요"||o==="더 전할래요"){ setOptions([]); robot("네, 천천히 말씀해 주세요. 제가 잘 듣고 있어요.", []); return; }
+  if(o==="다른 거 들을래요"){ openReading(); return; }
+  if(S.screen==='talk'){ if(["좋음","보통","안 좋음"].indexOf(o)>=0) return pickMood(o); if(["없어요","조금 있어요"].indexOf(o)>=0) return pickDiscomfort(o); }
+  if(S.screen==='reminisce'){ if(o.indexOf(" 이야기")>=0 && TOPICS[o.replace(" 이야기","")]) return pickTopic(o); setOptions([]); return sendElder(o); }
+  if(S.screen==='reading'){ var hit=false; READINGS.forEach(function(r){if(r.t===o)hit=true;}); if(hit) return pickReading(o);
+    if(o==="좋았어요"){ setOptions([]); robot("다행이에요. 또 무엇을 해볼까요?", ["메뉴로 갈래요"]); return; } }
+  if(S.screen==='letter'){ if(["자녀","손주","남편·아내","형제"].indexOf(o)>=0) return pickLetterTo(o); }
+  setOptions([]); sendElder(o);
+};
+
+/* ============ 마무리 + 기록 ============ */
+function finish(){
+  S.screen='record'; showMenu(false); setOptions([]); showInput(false);
+  var moodTxt = S.moods.length?S.moods.join(", ")+" 표현":"대화 참여";
+  var topics = Object.keys(S.topicsDiscussed); var topicTxt = topics.length?topics.join(", ")+" 등 회상 대화":"안부·일상 대화";
+  var needTxt = S.letter?(S.letterTo+"에게 전할 말 있음 / 가족과의 소통 욕구"):"특이사항 없음";
+  var follow = S.risks.length?"위험신호 확인 및 사회복지사·간호팀 대응 필요":(S.letter?"가족 연계(통화·면회) 검토":"지속 관찰");
+  S.record={ ts:nowStr(), mood:moodTxt, main:topicTxt, need:needTxt, follow:follow };
+  renderStaff();
+  robot(S.name+" "+S.hon+", 오늘 함께 이야기 나눠서 좋았어요. 제가 선생님께 잘 전해드릴게요. 안녕히 계세요.", []);
+}
+
+/* ============ 직원 화면 ============ */
+function renderStaff(){
+  var ac=document.getElementById('alertCard');
+  ac.style.background = S.risks.length?'var(--alertSoft)':'var(--card)';
+  ac.style.borderColor = S.risks.length?'var(--alert)':'var(--line)';
+  var html='<h2 style="margin:0 0 10px;font-size:20px;color:'+(S.risks.length?'var(--alert)':'var(--ink)')+'">위험 알림</h2>';
+  if(!S.risks.length) html+='<p class="muted" style="margin:0;">현재 감지된 위험신호가 없습니다.</p>';
+  else S.risks.forEach(function(r,i){
+    html+='<div style="padding:10px 0;'+(i?'border-top:1px solid var(--line);':'')+'">'+
+      '<strong style="color:var(--alert)">긴급 · '+r.cat+'</strong>'+
+      '<div class="muted">'+r.ts+' · '+(S.name||"수급자")+' · 발화: "'+r.quote+'"</div>'+
+      '<div style="font-size:14px;margin-top:2px;">→ 사회복지사·간호팀 확인 필요</div></div>';
+  });
+  ac.innerHTML=html;
+
+  var rb=document.getElementById('recordBody');
+  if(!S.record){ rb.innerHTML='<p class="muted">어르신 화면에서 \'오늘 대화 마치고 기록 만들기\'를 누르면 자동 생성됩니다.</p>'; return; }
+  var items="";
+  SERVICE_ITEMS.forEach(function(s){ var on=!!S.provided[s.id];
+    items+='<div class="item"><span class="ck" style="color:'+(on?'var(--teal)':'var(--line)')+'">'+(on?'✓':'·')+'</span><span style="color:'+(on?'var(--ink)':'var(--sub)')+'">'+s.label+'</span></div>'; });
+  var letter = S.record && S.letter?'<div class="recrow"><div class="k">의사전달 대행</div><div class="v">('+S.letter.to+') "'+S.letter.body+'"</div></div>':"";
+  rb.innerHTML=
+    '<div class="recrow"><div class="k">수급자</div><div class="v">'+S.name+' '+S.hon+'</div></div>'+
+    '<div class="recrow"><div class="k">일시</div><div class="v">'+S.record.ts+'</div></div>'+
+    '<div style="margin:10px 0;"><div class="muted" style="margin-bottom:6px;">제공한 정서지원·의사소통 급여 항목</div>'+items+'</div>'+
+    '<div class="recrow"><div class="k">정서 상태</div><div class="v">'+S.record.mood+'</div></div>'+
+    '<div class="recrow"><div class="k">대화 주요내용</div><div class="v">'+S.record.main+'</div></div>'+
+    '<div class="recrow"><div class="k">파악된 욕구</div><div class="v">'+S.record.need+'</div></div>'+
+    letter+
+    '<div class="recrow"><div class="k">위험신호</div><div class="v">'+(S.risks.length?S.risks.map(function(r){return r.cat;}).join(", "):"없음")+'</div></div>'+
+    '<div class="recrow"><div class="k">후속조치</div><div class="v">'+S.record.follow+'</div></div>';
+}
+
+/* ============ 기타 ============ */
+function nowStr(){ return new Date().toLocaleString("ko-KR",{hour12:false}); }
+function setView(v){ S.view=v;
+  document.getElementById('elderView').className='wrap'+(v==='elder'?'':' hidden');
+  document.getElementById('staffView').className='wrap'+(v==='staff'?'':' hidden');
+  document.getElementById('tabElder').className='tab'+(v==='elder'?' on':'');
+  document.getElementById('tabStaff').className='tab'+(v==='staff'?' on':'');
+  if(v==='staff') renderStaff();
+}
+function setFont(s){ document.documentElement.style.setProperty('--fs',s); }
+function resetAll(){
+  if(window.speechSynthesis) window.speechSynthesis.cancel();
+  S={ name:"", hon:"어르신", view:"elder", screen:"menu", topic:null, provided:{}, risks:[], moods:[], topicsDiscussed:{}, letter:null, letterTo:"" };
+  document.getElementById('transcript').innerHTML="";
+  document.getElementById('options').innerHTML="";
+  document.getElementById('riskBanner').classList.add('hidden');
+  document.getElementById('chat').classList.add('hidden');
+  document.getElementById('setup').classList.remove('hidden');
+  document.getElementById('nameInput').value="";
+  renderStaff();
+}
+
+/* 호칭 칩 + 엔터 + 마이크 가용성 */
+(function init(){
+  var hc=document.getElementById('honChips');
+  ["어르신","어머니","아버님","여사님","선생님"].forEach(function(h){
+    var b=document.createElement('button'); b.className='chip'+(h===S.hon?' on':''); b.textContent=h;
+    b.onclick=function(){ S.hon=h; Array.prototype.forEach.call(hc.children,function(c){c.className='chip';}); b.className='chip on'; };
+    hc.appendChild(b);
+  });
+  document.getElementById('elderInput').addEventListener('keydown',function(e){ if(e.key==='Enter') sendElder(); });
+  if(!micAvailable()){ var mb=document.getElementById('micBtn'); if(mb){ mb.textContent="음성 미지원"; mb.disabled=true; mb.style.opacity=.5; } }
+  if(window.speechSynthesis){
+    window.speechSynthesis.onvoiceschanged=function(){};
+    // iOS/모바일: 첫 사용자 터치에서 음성 합성 잠금 해제
+    var primed=false;
+    document.addEventListener('touchstart', function prime(){
+      if(primed) return; primed=true;
+      try{ window.speechSynthesis.speak(new SpeechSynthesisUtterance("")); }catch(e){}
+    }, {once:true, passive:true});
+  }
+})();
+</script>
+</body>
+</html>
